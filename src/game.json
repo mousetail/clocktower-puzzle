@@ -1,0 +1,190 @@
+{
+  "players": [
+    {
+      "name": "Alice",
+      "role": "Barber",
+      "information": [],
+      "death_status": {
+        "cause": "execution",
+        "day": 1
+      }
+    },
+    {
+      "name": "Bob",
+      "role": "Seamstress",
+      "information": [{ "night": 4, "information": "P4 + P11 = Yes" }],
+      "death_status": {
+        "cause": "execution",
+        "day": 4
+      }
+    },
+    {
+      "name": "Charlie",
+      "role": "Clockmaker",
+      "information": [{ "night": 1, "information": "1" }],
+      "death_status": {
+        "cause": "witch",
+        "day": 3
+      }
+    },
+    {
+      "name": "Deborah",
+      "role": "Sage",
+      "information": [],
+      "death_status": "alive"
+    },
+    {
+      "name": "Ethan",
+      "role": "Dreamer",
+      "information": [
+        { "night": 1, "information": "P4: Sage / Vortox" },
+        { "night": 2, "information": "P12: Artist / Witch" },
+        { "night": 3, "information": "P9: Snake Charmer / Fang Gu" },
+        { "night": 4, "information": "P4: Sage / Pit Hag" }
+      ],
+      "death_status": {
+        "cause": "demon",
+        "night": 5
+      }
+    },
+    {
+      "name": "Fiona",
+      "role": "Mathematician",
+      "information": [
+        { "night": 1, "information": 0 },
+        { "night": 2, "information": 1 },
+        { "night": 3, "information": 0 }
+      ],
+      "death_status": {
+        "cause": "execution",
+        "day": 3
+      }
+    },
+    {
+      "name": "Genevive",
+      "role": "Oracle",
+      "information": [
+        { "night": 2, "information": 1 },
+        { "night": 3, "information": 0 },
+        { "night": 4, "information": 2 },
+        { "night": 5, "information": 2 }
+      ],
+      "death_status": {
+        "cause": "demon",
+        "night": 6
+      }
+    },
+    {
+      "name": "Harry",
+      "role": "Klutz",
+      "information": [
+        { "day": 2, "information": "Picked P5 and the game continued" }
+      ],
+      "death_status": {
+        "cause": "witch",
+        "day": 2
+      }
+    },
+    {
+      "name": "Irene",
+      "role": "Snake Charmer",
+      "information": [
+        { "night": 1, "information": "P2, no swap" },
+        { "night": 2, "information": "P5, no swap" },
+        { "night": 3, "information": "P10, no swap" }
+      ],
+      "death_status": {
+        "cause": "demon",
+        "night": 4
+      }
+    },
+    {
+      "name": "Juliet",
+      "role": "Town Crier",
+      "information": [
+        { "night": 2, "information": "NO" },
+        { "night": 3, "information": "YES" },
+        { "night": 4, "information": "YES" },
+        { "night": 5, "information": "NO" },
+        { "night": 6, "information": "YES" }
+      ],
+      "death_status": "alive"
+    },
+    {
+      "name": "Kevin",
+      "role": "Flowergirl",
+      "information": [
+        { "night": 2, "information": "YES" },
+        { "night": 3, "information": "NO" },
+        { "night": 4, "information": "YES" },
+        { "night": 5, "information": "YES" },
+        { "night": 6, "information": "YES" }
+      ],
+      "death_status": "alive"
+    },
+    {
+      "name": "Lewis",
+      "role": "Artist",
+      "information": [
+        {
+          "day": 1,
+          "information": "Asked after the execution: \"Was P1 good and P4 the only evil player among everyone who voted today?\" and got a YES"
+        }
+      ],
+      "death_status": {
+        "cause": "demon",
+        "night": 2
+      }
+    }
+  ],
+  "timeline": [
+    {
+      "day": 1,
+      "night": 1,
+      "deaths_at_night": [],
+      "nominated": [6],
+      "voted": [2, 3, 4, 5, 7, 10, 11, 12],
+      "executed": [1],
+      "witch_deaths": []
+    },
+    {
+      "day": 2,
+      "night": 2,
+      "deaths_at_night": [12],
+      "nominated": [8, 4, 10],
+      "voted": [2, 5, 7, 10, 4, 11],
+      "executed": [],
+      "witch_deaths": [8]
+    },
+    {
+      "day": 3,
+      "night": 3,
+      "deaths_at_night": [],
+      "nominated": [3, 4, 10],
+      "voted": [2, 5, 7, 4, 9, 11, 10],
+      "executed": [6],
+      "witch_deaths": [3]
+    },
+    {
+      "day": 4,
+      "night": 4,
+      "deaths_at_night": [9],
+      "nominated": [10, 7, 11],
+      "voted": [5, 10, 11, 4, 7],
+      "executed": [2]
+    },
+    {
+      "day": 5,
+      "night": 5,
+      "deaths_at_night": [5],
+      "nominated": [4, 10],
+      "voted": [4, 10],
+      "executed": [8],
+      "witch_deaths": []
+    },
+    {
+      "night": 6,
+      "deaths_at_night": [7]
+    }
+  ]
+}
