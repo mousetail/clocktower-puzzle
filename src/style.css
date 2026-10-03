@@ -315,6 +315,28 @@ body {
   cursor: pointer;
 }
 
+.info-notes {
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  resize: vertical;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.player-info .info-notes {
+  pointer-events: auto;
+}
+
+.info-notes:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* Sidebar */
 
 .sidebar {
@@ -478,22 +500,63 @@ body {
 
 /* Legend */
 
-.notice {
+.left-rail {
   position: fixed;
   top: 16px;
+  bottom: 16px;
   left: 16px;
-  max-width: 340px;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  pointer-events: none;
+}
+
+.notice {
   margin: 0;
   color: #b9c0d0;
   font-size: 12px;
   line-height: 1.5;
-  pointer-events: none;
+}
+
+.global-notes {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.global-notes-title {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.global-notes-area {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  outline: none;
+  resize: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.global-notes-area::placeholder {
+  color: var(--muted);
 }
 
 .legend {
-  position: fixed;
-  left: 16px;
-  bottom: 16px;
   pointer-events: none;
 }
 

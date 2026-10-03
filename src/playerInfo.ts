@@ -8,6 +8,7 @@ import {
 import { buildPlayerText } from "./playerTag.ts";
 import type { PlayerTagHandlers } from "./playerTag.ts";
 import type { InfoLogControls } from "./infoLogState.ts";
+import type { NotesControls } from "./notesState.ts";
 import type { Reminder } from "./reminders.ts";
 import type { PlayerInfo } from "./types.ts";
 
@@ -16,15 +17,18 @@ export class PlayerInfoView {
   private readonly players: readonly PlayerInfo[];
   private readonly handlers: PlayerTagHandlers;
   private readonly infoLog: InfoLogControls;
+  private readonly notes: NotesControls;
 
   constructor(
     players: readonly PlayerInfo[],
     handlers: PlayerTagHandlers,
     infoLog: InfoLogControls,
+    notes: NotesControls,
   ) {
     this.players = players;
     this.handlers = handlers;
     this.infoLog = infoLog;
+    this.notes = notes;
     this.root = el("div", "player-info");
     this.render(null, undefined, []);
   }
@@ -69,6 +73,7 @@ export class PlayerInfoView {
     if (reminders.length > 0) {
       children.push(buildReminders(reminders));
     }
+    children.push(buildNotes(number, this.notes));
     replaceChildren(this.root, ...children);
   }
 
@@ -126,6 +131,18 @@ function buildInfoLogToggle(
   checkbox.addEventListener("change", () => infoLog.onToggle(number));
   label.append(checkbox, el("span", "info-toggle-text", "Show in log"));
   return label;
+}
+
+function buildNotes(number: number, notes: NotesControls): HTMLElement {
+  const section = el("div", "info-section");
+  section.append(el("div", "info-section-title", "Notes"));
+  const area = el("textarea", "info-notes");
+  area.value = notes.get(number);
+  area.placeholder = "Notes…";
+  area.rows = 3;
+  area.addEventListener("input", () => notes.onChange(number, area.value));
+  section.append(area);
+  return section;
 }
 
 function buildReminders(reminders: readonly Reminder[]): HTMLElement {

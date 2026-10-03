@@ -16,6 +16,9 @@ import { remindersFor } from "./reminders.ts";
 import { ReminderState } from "./reminderState.ts";
 import { InfoLogState } from "./infoLogState.ts";
 import type { InfoLogControls } from "./infoLogState.ts";
+import { buildGlobalNotes } from "./globalNotes.ts";
+import { PlayerNotesState } from "./notesState.ts";
+import type { NotesControls } from "./notesState.ts";
 import { readStorage, writeStorage } from "./storage.ts";
 import type { PlayerTagHandlers } from "./playerTag.ts";
 import { validateGame, validateTimeline } from "./validate.ts";
@@ -35,6 +38,8 @@ for (const issue of issues) {
 const REMINDERS_KEY = "clocktower.reminders";
 const LABEL_MODE_KEY = "clocktower.labelMode";
 const INFO_LOG_KEY = "clocktower.infoLog";
+const NOTES_KEY = "clocktower.notes";
+const GLOBAL_NOTES_KEY = "clocktower.globalNotes";
 
 const storedMode = readStorage(LABEL_MODE_KEY);
 let labelMode: LabelMode = storedMode !== null && isLabelMode(storedMode) ? storedMode : "number";
@@ -64,7 +69,21 @@ const infoLogControls: InfoLogControls = {
   },
 };
 
-const infoView = new PlayerInfoView(game.players, handlers, infoLogControls);
+const playerNotes = PlayerNotesState.fromJson(readStorage(NOTES_KEY));
+const notesControls: NotesControls = {
+  get: (player) => playerNotes.get(player),
+  onChange: (player, text) => {
+    playerNotes.set(player, text);
+    writeStorage(NOTES_KEY, playerNotes.serialize());
+  },
+};
+
+const infoView = new PlayerInfoView(
+  game.players,
+  handlers,
+  infoLogControls,
+  notesControls,
+);
 let picker: ReminderPicker | null = null;
 
 const circleView = new CircleView(game.players, {
@@ -162,7 +181,15 @@ sidebar.append(toolbar, logPanel);
 
 const app = el("div", "app");
 app.append(board, sidebar);
-document.body.append(app, buildLegend(), buildNotice(), picker.element);
+
+const globalNotes = buildGlobalNotes(readStorage(GLOBAL_NOTES_KEY) ?? "", {
+  onChange: (text) => writeStorage(GLOBAL_NOTES_KEY, text),
+});
+
+const leftRail = el("div", "left-rail");
+leftRail.append(buildNotice(), globalNotes, buildLegend());
+
+document.body.append(app, leftRail, picker.element);
 
 circleView.updateReminders(reminderState);
 refresh();
