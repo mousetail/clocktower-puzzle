@@ -3,6 +3,10 @@ import type { PlayerInfo } from "./types.ts";
 
 export type LabelMode = "number" | "name" | "role";
 
+export function isLabelMode(value: string): value is LabelMode {
+  return value === "number" || value === "name" || value === "role";
+}
+
 export function tagLabel(
   number: number,
   players: readonly PlayerInfo[],

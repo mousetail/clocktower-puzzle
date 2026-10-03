@@ -6,6 +6,7 @@ import { collectDeaths } from "./deaths.ts";
 import { el } from "./dom.ts";
 import { buildLegend } from "./legend.ts";
 import { LabelToggle } from "./labelToggle.ts";
+import { isLabelMode } from "./labels.ts";
 import type { LabelMode } from "./labels.ts";
 import { LogView } from "./log.ts";
 import { buildNotice } from "./notice.ts";
@@ -15,6 +16,7 @@ import { remindersFor } from "./reminders.ts";
 import { ReminderState } from "./reminderState.ts";
 import { InfoLogState } from "./infoLogState.ts";
 import type { InfoLogControls } from "./infoLogState.ts";
+import { readStorage, writeStorage } from "./storage.ts";
 import type { PlayerTagHandlers } from "./playerTag.ts";
 import { validateGame, validateTimeline } from "./validate.ts";
 
@@ -30,10 +32,19 @@ for (const issue of issues) {
   console.error(`[${issue.severity}] ${issue.message}`);
 }
 
-const reminderState = new ReminderState();
+const REMINDERS_KEY = "clocktower.reminders";
+const LABEL_MODE_KEY = "clocktower.labelMode";
+
+const storedMode = readStorage(LABEL_MODE_KEY);
+let labelMode: LabelMode = storedMode !== null && isLabelMode(storedMode) ? storedMode : "number";
+
+const reminderState = ReminderState.fromJson(readStorage(REMINDERS_KEY));
 let selected: number | null = null;
 let hovered: number | null = null;
-let labelMode: LabelMode = "number";
+
+function saveReminders(): void {
+  writeStorage(REMINDERS_KEY, reminderState.serialize());
+}
 
 const handlers: PlayerTagHandlers = {
   onHighlight: highlightPlayer,
@@ -70,12 +81,14 @@ const circleView = new CircleView(game.players, {
 
 picker = new ReminderPicker(reminderState, () => {
   circleView.updateReminders(reminderState);
+  saveReminders();
   refresh();
 });
 
 function removeReminder(player: number, id: string): void {
   reminderState.toggle(player, id);
   circleView.updateReminders(reminderState);
+  saveReminders();
   refresh();
 }
 
@@ -113,6 +126,7 @@ clearButton.type = "button";
 clearButton.addEventListener("click", () => {
   reminderState.clear();
   circleView.updateReminders(reminderState);
+  saveReminders();
   refresh();
 });
 
@@ -120,6 +134,7 @@ const toolbar = el("div", "sidebar-toolbar");
 
 const labelToggle = new LabelToggle((mode) => {
   labelMode = mode;
+  writeStorage(LABEL_MODE_KEY, mode);
   renderLog();
   refresh();
 });
@@ -147,4 +162,5 @@ const app = el("div", "app");
 app.append(board, sidebar);
 document.body.append(app, buildLegend(), buildNotice(), picker.element);
 
+circleView.updateReminders(reminderState);
 refresh();
