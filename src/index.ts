@@ -11,11 +11,16 @@ import { PlayerInfoView } from "./playerInfo.ts";
 import { ReminderPicker } from "./reminderPicker.ts";
 import { remindersFor } from "./reminders.ts";
 import { ReminderState } from "./reminderState.ts";
-import { validateGame } from "./validate.ts";
+import type { PlayerTagHandlers } from "./playerTag.ts";
+import { validateGame, validateTimeline } from "./validate.ts";
 
 const game = parseGame(gameData);
 const deaths = collectDeaths(game.timeline, game.players.length);
-const issues = [...game.dataIssues, ...validateGame(game.players, deaths)];
+const issues = [
+  ...game.dataIssues,
+  ...validateGame(game.players, deaths),
+  ...validateTimeline(game.timeline),
+];
 
 for (const issue of issues) {
   console.error(`[${issue.severity}] ${issue.message}`);
@@ -25,7 +30,12 @@ const reminderState = new ReminderState();
 let selected: number | null = null;
 let hovered: number | null = null;
 
-const infoView = new PlayerInfoView();
+const handlers: PlayerTagHandlers = {
+  onHighlight: highlightPlayer,
+  onSelect: selectPlayer,
+};
+
+const infoView = new PlayerInfoView(game.players, handlers);
 let picker: ReminderPicker | null = null;
 
 const circleView = new CircleView(game.players, {
@@ -49,6 +59,15 @@ picker = new ReminderPicker(reminderState, () => {
 function removeReminder(player: number, id: string): void {
   reminderState.toggle(player, id);
   circleView.updateReminders(reminderState);
+  refresh();
+}
+
+function highlightPlayer(player: number | null): void {
+  circleView.setExternalHighlight(player);
+}
+
+function selectPlayer(player: number): void {
+  selected = player;
   refresh();
 }
 
@@ -81,7 +100,7 @@ toolbar.append(clearButton);
 
 const logPanel = el("section", "panel log-panel");
 logPanel.append(el("h2", "panel-title", "Game log"));
-logPanel.append(new LogView(game.timeline, game.players, deaths).element);
+logPanel.append(new LogView(game.timeline, game.players, deaths, handlers).element);
 
 const sidebar = el("aside", "sidebar");
 sidebar.append(toolbar, logPanel);

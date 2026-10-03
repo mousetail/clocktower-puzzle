@@ -62,6 +62,12 @@ export class CircleView {
     }
   }
 
+  setExternalHighlight(player: number | null): void {
+    for (const [number, token] of this.tokens) {
+      token.classList.toggle("highlighted", number === player);
+    }
+  }
+
   updateReminders(state: ReminderState): void {
     for (const [number, chips] of this.chips) {
       const elements: HTMLElement[] = [];

@@ -1,6 +1,7 @@
 import type {
   DeathEvent,
   DeathStatus,
+  LogEntry,
   PlayerInfo,
   ValidationIssue,
 } from "./types.ts";
@@ -63,4 +64,24 @@ function matches(event: DeathEvent, status: DeathStatus): boolean {
   return (
     event.phase === "day" && event.cause === status.cause && event.day === status.day
   );
+}
+
+/** A player killed by the witch must have nominated on the same day. */
+export function validateTimeline(timeline: readonly LogEntry[]): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+  for (const entry of timeline) {
+    if (entry.kind !== "day") {
+      continue;
+    }
+    for (const player of entry.witch_deaths) {
+      if (!entry.nominated.includes(player)) {
+        issues.push({
+          player,
+          severity: "error",
+          message: `P${player} was killed by the witch on day ${entry.day} but did not nominate that day.`,
+        });
+      }
+    }
+  }
+  return issues;
 }

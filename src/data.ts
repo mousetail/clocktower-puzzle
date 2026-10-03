@@ -19,8 +19,7 @@ type RawDeathStatus = string | { cause?: string; night?: number; day?: number };
 
 type RawPlayer = {
   name: string;
-  role?: string;
-  forle?: string;
+  role: string;
   information?: readonly RawInformation[];
   death_status?: RawDeathStatus;
 };
@@ -54,15 +53,7 @@ function parsePlayer(
   number: number,
   issues: ValidationIssue[],
 ): PlayerInfo {
-  const role = raw.role ?? raw.forle;
-  if (raw.role === undefined && raw.forle !== undefined) {
-    issues.push({
-      player: number,
-      severity: "warning",
-      message: `P${number} (${raw.name}) uses a misspelled "forle" field; reading role as "${raw.forle}".`,
-    });
-  }
-  if (role === undefined) {
+  if (raw.role === undefined) {
     issues.push({
       player: number,
       severity: "warning",
@@ -71,7 +62,7 @@ function parsePlayer(
   }
   return {
     name: raw.name,
-    role: role ?? "Unknown",
+    role: raw.role ?? "Unknown",
     information: parseInformation(raw.information ?? [], number, issues),
     death_status: parseDeathStatus(raw.death_status, number, issues),
   };
