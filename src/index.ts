@@ -34,6 +34,7 @@ for (const issue of issues) {
 
 const REMINDERS_KEY = "clocktower.reminders";
 const LABEL_MODE_KEY = "clocktower.labelMode";
+const INFO_LOG_KEY = "clocktower.infoLog";
 
 const storedMode = readStorage(LABEL_MODE_KEY);
 let labelMode: LabelMode = storedMode !== null && isLabelMode(storedMode) ? storedMode : "number";
@@ -52,11 +53,12 @@ const handlers: PlayerTagHandlers = {
   getLabelMode: () => labelMode,
 };
 
-const infoLogState = new InfoLogState();
+const infoLogState = InfoLogState.fromJson(readStorage(INFO_LOG_KEY));
 const infoLogControls: InfoLogControls = {
   isShown: (player) => infoLogState.has(player),
   onToggle: (player) => {
     infoLogState.toggle(player);
+    writeStorage(INFO_LOG_KEY, infoLogState.serialize());
     renderLog();
     refresh();
   },
