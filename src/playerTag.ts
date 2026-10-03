@@ -1,5 +1,6 @@
 import { el } from "./dom.ts";
-import { playerLabel } from "./format.ts";
+import { tagLabel } from "./labels.ts";
+import type { LabelMode } from "./labels.ts";
 import type { PlayerInfo } from "./types.ts";
 
 export type HighlightHandler = (player: number | null) => void;
@@ -8,6 +9,7 @@ export type SelectHandler = (player: number) => void;
 export type PlayerTagHandlers = {
   onHighlight: HighlightHandler;
   onSelect: SelectHandler;
+  getLabelMode: () => LabelMode;
 };
 
 export function buildPlayerTag(
@@ -15,10 +17,17 @@ export function buildPlayerTag(
   players: readonly PlayerInfo[],
   handlers: PlayerTagHandlers,
 ): HTMLElement {
-  const tag = el("span", "player-tag", playerLabel(number));
-  const name = players[number - 1]?.name;
-  if (name !== undefined) {
-    tag.title = name;
+  const tag = el(
+    "span",
+    "player-tag",
+    tagLabel(number, players, handlers.getLabelMode()),
+  );
+  const player = players[number - 1];
+  if (player !== undefined) {
+    tag.title = player.name;
+    if (player.death_status === "alive") {
+      tag.classList.add("tag-alive");
+    }
   }
   tag.addEventListener("mouseenter", () => handlers.onHighlight(number));
   tag.addEventListener("mouseleave", () => handlers.onHighlight(null));

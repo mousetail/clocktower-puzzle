@@ -10,7 +10,9 @@ export function dayOrder(day: number): number {
 }
 
 export function phaseOrder(event: DeathEvent): number {
-  return event.phase === "night" ? nightOrder(event.night) : dayOrder(event.day);
+  return event.phase === "night"
+    ? nightOrder(event.night)
+    : dayOrder(event.day);
 }
 
 export function collectDeaths(

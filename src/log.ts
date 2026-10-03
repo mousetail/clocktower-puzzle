@@ -1,13 +1,15 @@
 import { dayOrder, nightOrder } from "./deaths.ts";
 import { el } from "./dom.ts";
-import { buildPlayerTag } from "./playerTag.ts";
+import { buildPlayerTag, buildPlayerText } from "./playerTag.ts";
 import type { PlayerTagHandlers } from "./playerTag.ts";
+import type { InfoLogState } from "./infoLogState.ts";
 import type { DayLogEntry, DeathEvent, LogEntry, PlayerInfo } from "./types.ts";
 
 type LogContext = {
   players: readonly PlayerInfo[];
   deaths: Map<number, DeathEvent[]>;
   handlers: PlayerTagHandlers;
+  infoLog: InfoLogState;
 };
 
 export class LogView {
@@ -18,8 +20,9 @@ export class LogView {
     players: readonly PlayerInfo[],
     deaths: Map<number, DeathEvent[]>,
     handlers: PlayerTagHandlers,
+    infoLog: InfoLogState,
   ) {
-    const context: LogContext = { players, deaths, handlers };
+    const context: LogContext = { players, deaths, handlers, infoLog };
     this.root = el("div", "log");
     for (const entry of timeline) {
       this.root.append(buildEntry(entry, context));
@@ -48,6 +51,7 @@ function buildNight(
   const section = el("section", "log-phase log-night");
   section.append(el("h3", "phase-title", `Night ${night}`));
   section.append(buildPlayers("Deaths", deathsAtNight, context, "no deaths"));
+  section.append(...buildInfoRows("night", night, context));
   return section;
 }
 
@@ -57,7 +61,54 @@ function buildDay(entry: DayLogEntry, context: LogContext): HTMLElement {
   section.append(buildExecuted(entry, context));
   section.append(buildNominated(entry, context));
   section.append(buildPlayers("Voted", entry.voted, context, "none"));
+  section.append(...buildInfoRows("day", entry.day, context));
   return section;
+}
+
+function buildInfoRows(
+  phase: "night" | "day",
+  number: number,
+  context: LogContext,
+): HTMLElement[] {
+  const rows: HTMLElement[] = [];
+  context.players.forEach((player, index) => {
+    const playerNumber = index + 1;
+    if (!context.infoLog.has(playerNumber)) {
+      return;
+    }
+    for (const entry of player.information) {
+      const matches =
+        phase === "night"
+          ? "night" in entry && entry.night === number
+          : "day" in entry && entry.day === number;
+      if (matches) {
+        rows.push(
+          buildInfoRow(playerNumber, player.role, entry.information, context),
+        );
+      }
+    }
+  });
+  return rows;
+}
+
+function buildInfoRow(
+  player: number,
+  role: string,
+  information: string | number,
+  context: LogContext,
+): HTMLElement {
+  const row = el("div", "log-row");
+  const label = el("span", "log-label log-info-label", `${role}:`);
+  label.addEventListener("click", () => context.handlers.onSelect(player));
+  if (typeof information === "number") {
+    row.append(label, el("span", "log-value", information));
+  } else {
+    row.append(
+      label,
+      buildPlayerText(information, context.players, context.handlers),
+    );
+  }
+  return row;
 }
 
 function buildExecuted(entry: DayLogEntry, context: LogContext): HTMLElement {
@@ -69,7 +120,8 @@ function buildExecuted(entry: DayLogEntry, context: LogContext): HTMLElement {
   } else {
     for (const player of entry.executed) {
       const first = context.deaths.get(player)?.[0];
-      const alreadyDead = first !== undefined && orderOf(first) < dayOrder(entry.day);
+      const alreadyDead =
+        first !== undefined && orderOf(first) < dayOrder(entry.day);
       const tag = buildPlayerTag(player, context.players, context.handlers);
       if (alreadyDead) {
         tag.classList.add("repeat");
@@ -122,5 +174,7 @@ function buildPlayers(
 }
 
 function orderOf(event: DeathEvent): number {
-  return event.phase === "night" ? nightOrder(event.night) : dayOrder(event.day);
+  return event.phase === "night"
+    ? nightOrder(event.night)
+    : dayOrder(event.day);
 }

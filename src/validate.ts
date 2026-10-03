@@ -13,7 +13,12 @@ export function validateGame(
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   players.forEach((player, index) => {
-    validatePlayer(index + 1, player.death_status, deaths.get(index + 1) ?? [], issues);
+    validatePlayer(
+      index + 1,
+      player.death_status,
+      deaths.get(index + 1) ?? [],
+      issues,
+    );
   });
   return issues;
 }
@@ -58,16 +63,22 @@ function matches(event: DeathEvent, status: DeathStatus): boolean {
   }
   if (status.cause === "demon") {
     return (
-      event.phase === "night" && event.cause === "demon" && event.night === status.night
+      event.phase === "night" &&
+      event.cause === "demon" &&
+      event.night === status.night
     );
   }
   return (
-    event.phase === "day" && event.cause === status.cause && event.day === status.day
+    event.phase === "day" &&
+    event.cause === status.cause &&
+    event.day === status.day
   );
 }
 
 /** A player killed by the witch must have nominated on the same day. */
-export function validateTimeline(timeline: readonly LogEntry[]): ValidationIssue[] {
+export function validateTimeline(
+  timeline: readonly LogEntry[],
+): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   for (const entry of timeline) {
     if (entry.kind !== "day") {

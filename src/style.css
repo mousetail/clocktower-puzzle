@@ -25,7 +25,12 @@ body {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   font-size: 14px;
 }
 
@@ -292,6 +297,24 @@ body {
   font-weight: 600;
 }
 
+.info-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.player-info .info-toggle {
+  pointer-events: auto;
+}
+
+.info-toggle-checkbox {
+  cursor: pointer;
+}
+
 /* Sidebar */
 
 .sidebar {
@@ -300,7 +323,32 @@ body {
 }
 
 .sidebar-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 18px;
+}
+
+.label-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.label-option {
+  padding: 6px 10px;
+  background: var(--panel-2);
+  border: none;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.label-option.active {
+  background: var(--accent);
+  color: #ffffff;
 }
 
 .clear-reminders {
@@ -387,6 +435,15 @@ body {
   font-size: 12px;
 }
 
+.log-info-label {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.log-info-label:hover {
+  text-decoration: underline;
+}
+
 .player-tag {
   display: inline-flex;
   align-items: center;
@@ -402,6 +459,10 @@ body {
 .player-tag.repeat {
   border-style: dashed;
   color: var(--muted);
+}
+
+.player-tag.tag-alive {
+  border-color: rgba(74, 222, 128, 0.5);
 }
 
 .player-tag:hover {
@@ -540,18 +601,30 @@ body {
   color: var(--text);
   font-size: 12px;
   cursor: pointer;
+
+  &.accent-red {
+    color: #ff4d4d;
+  }
+
+  &.accent-rust {
+    color: #b7410e;
+  }
+
+  &.accent-cyan {
+    color: #22e0ff;
+  }
+
+  &.accent-mustard {
+    color: #ceff00;
+  }
+
+  &.accent-olive {
+    color: #ffb100;
+  }
 }
 
 .reminder-option:hover {
   border-color: var(--accent);
-}
-
-.reminder-option.accent-red {
-  color: #ff4d4d;
-}
-
-.reminder-option.accent-cyan {
-  color: #22e0ff;
 }
 
 .reminder-option.active {

@@ -123,7 +123,10 @@ function parseDeathStatus(
   if (raw.cause === "demon" && raw.night !== undefined) {
     return { cause: "demon", night: raw.night };
   }
-  if ((raw.cause === "witch" || raw.cause === "execution") && raw.day !== undefined) {
+  if (
+    (raw.cause === "witch" || raw.cause === "execution") &&
+    raw.day !== undefined
+  ) {
     return { cause: raw.cause, day: raw.day };
   }
   issues.push({

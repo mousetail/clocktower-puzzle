@@ -5,12 +5,16 @@ import { parseGame } from "./data.ts";
 import { collectDeaths } from "./deaths.ts";
 import { el } from "./dom.ts";
 import { buildLegend } from "./legend.ts";
+import { LabelToggle } from "./labelToggle.ts";
+import type { LabelMode } from "./labels.ts";
 import { LogView } from "./log.ts";
 import { buildNotice } from "./notice.ts";
 import { PlayerInfoView } from "./playerInfo.ts";
 import { ReminderPicker } from "./reminderPicker.ts";
 import { remindersFor } from "./reminders.ts";
 import { ReminderState } from "./reminderState.ts";
+import { InfoLogState } from "./infoLogState.ts";
+import type { InfoLogControls } from "./infoLogState.ts";
 import type { PlayerTagHandlers } from "./playerTag.ts";
 import { validateGame, validateTimeline } from "./validate.ts";
 
@@ -29,13 +33,25 @@ for (const issue of issues) {
 const reminderState = new ReminderState();
 let selected: number | null = null;
 let hovered: number | null = null;
+let labelMode: LabelMode = "number";
 
 const handlers: PlayerTagHandlers = {
   onHighlight: highlightPlayer,
   onSelect: selectPlayer,
+  getLabelMode: () => labelMode,
 };
 
-const infoView = new PlayerInfoView(game.players, handlers);
+const infoLogState = new InfoLogState();
+const infoLogControls: InfoLogControls = {
+  isShown: (player) => infoLogState.has(player),
+  onToggle: (player) => {
+    infoLogState.toggle(player);
+    renderLog();
+    refresh();
+  },
+};
+
+const infoView = new PlayerInfoView(game.players, handlers, infoLogControls);
 let picker: ReminderPicker | null = null;
 
 const circleView = new CircleView(game.players, {
@@ -47,7 +63,8 @@ const circleView = new CircleView(game.players, {
     hovered = player;
     refresh();
   },
-  onAddReminder: (player) => picker?.open(player, game.players[player - 1].name),
+  onAddReminder: (player) =>
+    picker?.open(player, game.players[player - 1].name),
   onRemoveReminder: removeReminder,
 });
 
@@ -78,7 +95,11 @@ function refresh(): void {
     infoView.show(null, undefined, []);
     return;
   }
-  infoView.show(shown, game.players[shown - 1], remindersFor(reminderState.get(shown)));
+  infoView.show(
+    shown,
+    game.players[shown - 1],
+    remindersFor(reminderState.get(shown)),
+  );
 }
 
 const stage = el("div", "stage");
@@ -96,11 +117,28 @@ clearButton.addEventListener("click", () => {
 });
 
 const toolbar = el("div", "sidebar-toolbar");
-toolbar.append(clearButton);
+
+const labelToggle = new LabelToggle((mode) => {
+  labelMode = mode;
+  renderLog();
+  refresh();
+});
+labelToggle.setMode(labelMode);
+toolbar.append(labelToggle.element, clearButton);
+
+const logBody = el("div", "log-body");
+
+function renderLog(): void {
+  logBody.replaceChildren(
+    new LogView(game.timeline, game.players, deaths, handlers, infoLogState)
+      .element,
+  );
+}
+
+renderLog();
 
 const logPanel = el("section", "panel log-panel");
-logPanel.append(el("h2", "panel-title", "Game log"));
-logPanel.append(new LogView(game.timeline, game.players, deaths, handlers).element);
+logPanel.append(el("h2", "panel-title", "Game log"), logBody);
 
 const sidebar = el("aside", "sidebar");
 sidebar.append(toolbar, logPanel);
