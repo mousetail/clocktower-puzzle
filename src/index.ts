@@ -1,7 +1,7 @@
 import "./style.css";
 import { CircleView } from "./circle.ts";
 import { parseGame } from "./data.ts";
-import { collectDeaths } from "./deaths.ts";
+import { collectDeaths, collectPhases } from "./deaths.ts";
 import { el } from "./dom.ts";
 import { findGame, GAMES } from "./games.ts";
 import type { GameEntry } from "./games.ts";
@@ -14,8 +14,8 @@ import { buildMenu } from "./menu.ts";
 import { buildNotice } from "./notice.ts";
 import { PlayerInfoView } from "./playerInfo.ts";
 import { ReminderPicker } from "./reminderPicker.ts";
-import { remindersFor } from "./reminders.ts";
 import { ReminderState } from "./reminderState.ts";
+import type { ReminderEntry } from "./reminderState.ts";
 import { InfoLogState } from "./infoLogState.ts";
 import type { InfoLogControls } from "./infoLogState.ts";
 import { buildGlobalNotes } from "./globalNotes.ts";
@@ -70,6 +70,7 @@ function renderGame(game: GameEntry): () => void {
 
   const data = parseGame(game.data);
   const deaths = collectDeaths(data.timeline, data.players.length);
+  const phases = collectPhases(data.timeline);
   const issues = [
     ...data.dataIssues,
     ...validateGame(data.players, deaths),
@@ -85,12 +86,14 @@ function renderGame(game: GameEntry): () => void {
   const INFO_LOG_KEY = key("infoLog");
   const NOTES_KEY = key("notes");
   const GLOBAL_NOTES_KEY = key("globalNotes");
+  const LOG_REMINDERS_KEY = key("logReminders");
 
   const storedMode = readStorage(LABEL_MODE_KEY);
   let labelMode: LabelMode =
     storedMode !== null && isLabelMode(storedMode) ? storedMode : "number";
 
   const reminderState = ReminderState.fromJson(readStorage(REMINDERS_KEY));
+  let showLogReminders = readStorage(LOG_REMINDERS_KEY) === "true";
   let selected: number | null = null;
   let hovered: number | null = null;
 
@@ -129,6 +132,7 @@ function renderGame(game: GameEntry): () => void {
     handlers,
     infoLogControls,
     notesControls,
+    { onRemove: removeReminderEntry },
   );
   let picker: ReminderPicker | null = null;
 
@@ -143,19 +147,25 @@ function renderGame(game: GameEntry): () => void {
     },
     onAddReminder: (player) =>
       picker?.open(player, data.players[player - 1].name),
-    onRemoveReminder: removeReminder,
+    onRemoveReminder: removeReminderEntry,
   });
 
-  picker = new ReminderPicker(reminderState, () => {
-    circleView.updateReminders(reminderState);
-    saveReminders();
-    refresh();
-  });
+  picker = new ReminderPicker(
+    reminderState,
+    game.edition,
+    phases,
+    remindersChanged,
+  );
 
-  function removeReminder(player: number, id: string): void {
-    reminderState.toggle(player, id);
+  function removeReminderEntry(player: number, entry: ReminderEntry): void {
+    reminderState.remove(player, entry);
+    remindersChanged();
+  }
+
+  function remindersChanged(): void {
     circleView.updateReminders(reminderState);
     saveReminders();
+    renderLog();
     refresh();
   }
 
@@ -178,7 +188,7 @@ function renderGame(game: GameEntry): () => void {
     infoView.show(
       shown,
       data.players[shown - 1],
-      remindersFor(reminderState.get(shown)),
+      reminderState.get(shown),
     );
   }
 
@@ -192,9 +202,7 @@ function renderGame(game: GameEntry): () => void {
   clearButton.type = "button";
   clearButton.addEventListener("click", () => {
     reminderState.clear();
-    circleView.updateReminders(reminderState);
-    saveReminders();
-    refresh();
+    remindersChanged();
   });
 
   const toolbar = el("div", "sidebar-toolbar");
@@ -210,17 +218,37 @@ function renderGame(game: GameEntry): () => void {
 
   const logBody = el("div", "log-body");
 
+  const logToggle = el("label", "log-toggle");
+  const logCheckbox = el("input", "log-toggle-checkbox");
+  logCheckbox.type = "checkbox";
+  logCheckbox.checked = showLogReminders;
+  logCheckbox.addEventListener("change", () => {
+    showLogReminders = logCheckbox.checked;
+    writeStorage(LOG_REMINDERS_KEY, showLogReminders ? "true" : "false");
+    renderLog();
+  });
+  logToggle.append(logCheckbox, el("span", "log-toggle-text", "Show reminders"));
+
   function renderLog(): void {
     logBody.replaceChildren(
-      new LogView(data.timeline, data.players, deaths, handlers, infoLogState)
-        .element,
+      new LogView(
+        data.timeline,
+        data.players,
+        deaths,
+        handlers,
+        infoLogState,
+        reminderState,
+        showLogReminders,
+      ).element,
     );
   }
 
   renderLog();
 
   const logPanel = el("section", "panel log-panel");
-  logPanel.append(el("h2", "panel-title", "Game log"), logBody);
+  const logHeader = el("div", "panel-header");
+  logHeader.append(el("h2", "panel-title", "Game log"), logToggle);
+  logPanel.append(logHeader, logBody);
 
   const globalNotes = buildGlobalNotes(readStorage(GLOBAL_NOTES_KEY) ?? "", {
     onChange: (text) => writeStorage(GLOBAL_NOTES_KEY, text),

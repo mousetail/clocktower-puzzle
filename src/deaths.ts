@@ -1,5 +1,11 @@
 import type { DeathEvent, LogEntry } from "./types.ts";
 
+/** A night or day phase of the game log. */
+export type LogPhase = {
+  phase: "day" | "night";
+  number: number;
+};
+
 /** Chronological order key: night N precedes day N. */
 export function nightOrder(night: number): number {
   return night * 2 - 1;
@@ -13,6 +19,34 @@ export function phaseOrder(event: DeathEvent): number {
   return event.phase === "night"
     ? nightOrder(event.night)
     : dayOrder(event.day);
+}
+
+/** Every night and day that appears in the timeline, in chronological order. */
+export function collectPhases(timeline: readonly LogEntry[]): LogPhase[] {
+  const phases: LogPhase[] = [];
+  const seen = new Set<string>();
+  const add = (phase: "day" | "night", number: number): void => {
+    const key = `${phase}:${number}`;
+    if (seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    phases.push({ phase, number });
+  };
+  for (const entry of timeline) {
+    add("night", entry.night);
+    if (entry.kind === "day") {
+      add("day", entry.day);
+    }
+  }
+  phases.sort((a, b) => phaseOrderOf(a) - phaseOrderOf(b));
+  return phases;
+}
+
+function phaseOrderOf(phase: LogPhase): number {
+  return phase.phase === "night"
+    ? nightOrder(phase.number)
+    : dayOrder(phase.number);
 }
 
 export function collectDeaths(

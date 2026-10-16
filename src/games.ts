@@ -4,6 +4,7 @@ export type RawGameFile = RawGameData & {
   name: string;
   edition?: string;
   author?: string;
+  publication_date?: string;
 };
 
 export type GameEntry = {
@@ -11,6 +12,7 @@ export type GameEntry = {
   name: string;
   edition?: string;
   author?: string;
+  publicationDate?: string;
   data: RawGameFile;
 };
 
@@ -34,6 +36,7 @@ function toEntry(path: string, data: RawGameFile): GameEntry {
     name: data.name ?? id,
     edition: data.edition,
     author: data.author,
+    publicationDate: data.publication_date,
     data,
   };
 }

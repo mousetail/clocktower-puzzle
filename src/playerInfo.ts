@@ -1,6 +1,7 @@
 import { el, replaceChildren } from "./dom.ts";
 import {
   describeInformationWhen,
+  describeReminderWhen,
   describeStatus,
   playerLabel,
   statusClass,
@@ -9,8 +10,13 @@ import { buildPlayerText } from "./playerTag.ts";
 import type { PlayerTagHandlers } from "./playerTag.ts";
 import type { InfoLogControls } from "./infoLogState.ts";
 import type { NotesControls } from "./notesState.ts";
-import type { Reminder } from "./reminders.ts";
+import { reminderById } from "./reminders/index.ts";
+import type { ReminderEntry } from "./reminderState.ts";
 import type { PlayerInfo } from "./types.ts";
+
+export type ReminderControls = {
+  onRemove: (player: number, entry: ReminderEntry) => void;
+};
 
 export class PlayerInfoView {
   private readonly root: HTMLElement;
@@ -18,17 +24,20 @@ export class PlayerInfoView {
   private readonly handlers: PlayerTagHandlers;
   private readonly infoLog: InfoLogControls;
   private readonly notes: NotesControls;
+  private readonly reminders: ReminderControls;
 
   constructor(
     players: readonly PlayerInfo[],
     handlers: PlayerTagHandlers,
     infoLog: InfoLogControls,
     notes: NotesControls,
+    reminders: ReminderControls,
   ) {
     this.players = players;
     this.handlers = handlers;
     this.infoLog = infoLog;
     this.notes = notes;
+    this.reminders = reminders;
     this.root = el("div", "player-info");
     this.render(null, undefined, []);
   }
@@ -40,7 +49,7 @@ export class PlayerInfoView {
   show(
     number: number | null,
     player: PlayerInfo | undefined,
-    reminders: readonly Reminder[],
+    reminders: readonly ReminderEntry[],
   ): void {
     this.render(number, player, reminders);
   }
@@ -48,7 +57,7 @@ export class PlayerInfoView {
   private render(
     number: number | null,
     player: PlayerInfo | undefined,
-    reminders: readonly Reminder[],
+    reminders: readonly ReminderEntry[],
   ): void {
     if (number === null || player === undefined) {
       replaceChildren(
@@ -71,7 +80,7 @@ export class PlayerInfoView {
       children.push(this.buildInformation(player));
     }
     if (reminders.length > 0) {
-      children.push(buildReminders(reminders));
+      children.push(buildReminders(number, reminders, this.reminders));
     }
     children.push(buildNotes(number, this.notes));
     replaceChildren(this.root, ...children);
@@ -145,13 +154,29 @@ function buildNotes(number: number, notes: NotesControls): HTMLElement {
   return section;
 }
 
-function buildReminders(reminders: readonly Reminder[]): HTMLElement {
+function buildReminders(
+  number: number,
+  entries: readonly ReminderEntry[],
+  controls: ReminderControls,
+): HTMLElement {
   const section = el("div", "info-section");
   section.append(el("div", "info-section-title", "Reminders"));
   const list = el("ul", "info-list");
-  for (const reminder of reminders) {
-    const item = el("li", "info-item", reminder.full);
+  for (const entry of entries) {
+    const reminder = reminderById(entry.id);
+    if (reminder === undefined) {
+      continue;
+    }
+    const item = el("li", "info-item reminder-item");
     item.classList.add(`accent-${reminder.accent}`);
+    item.append(el("span", "reminder-text", reminder.full));
+    if (entry.when !== undefined) {
+      item.append(
+        el("span", "reminder-when", describeReminderWhen(entry.when)),
+      );
+    }
+    item.title = `Remove ${reminder.full}`;
+    item.addEventListener("click", () => controls.onRemove(number, entry));
     list.append(item);
   }
   section.append(list);

@@ -1,4 +1,5 @@
 import { el } from "./dom.ts";
+import { formatDate } from "./format.ts";
 import type { GameEntry } from "./games.ts";
 import { gameHash } from "./router.ts";
 
@@ -8,7 +9,7 @@ export function buildMenu(games: readonly GameEntry[]): HTMLElement {
   main.append(el("p", "menu-subtitle", "Choose a puzzle to attempt"));
 
   if (games.length === 0) {
-    main.append(el("p", "menu-empty", "No games found."));
+    main.append(el("p", "menu-empty", "No puzzles found."));
     return main;
   }
 
@@ -39,5 +40,8 @@ function metaFor(game: GameEntry): string {
     parts.push(`by ${game.author}`);
   }
   parts.push(`${game.data.players.length} players`);
+  if (game.publicationDate !== undefined) {
+    parts.push(formatDate(game.publicationDate));
+  }
   return parts.join(" \u00b7 ");
 }

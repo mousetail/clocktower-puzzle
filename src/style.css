@@ -6,6 +6,11 @@
   --text: #e6e8ef;
   --muted: #8b91a3;
   --accent: #a855f7;
+  --accent-red: #ff4d4d;
+  --accent-rust: #b7410e;
+  --accent-cyan: #22e0ff;
+  --accent-mustard: #ceff00;
+  --accent-olive: #ffb100;
   --alive: #4ade80;
   --dead: #6b7280;
   --witch: #c084fc;
@@ -158,14 +163,6 @@ body {
   font-weight: 600;
   white-space: nowrap;
   cursor: cell;
-}
-
-.accent-red {
-  color: #ff4d4d;
-}
-
-.accent-cyan {
-  color: #22e0ff;
 }
 
 .add-reminder {
@@ -400,6 +397,31 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--muted);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.panel-header .panel-title {
+  margin: 0;
+}
+
+.log-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.log-toggle-checkbox {
+  cursor: pointer;
 }
 
 /* Log */
@@ -673,8 +695,9 @@ body {
   z-index: 10;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  justify-content: flex-start;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .modal-overlay[hidden] {
@@ -682,8 +705,8 @@ body {
 }
 
 .modal {
-  width: min(440px, 90vw);
-  max-height: 80vh;
+  width: min(440px, 100%);
+  max-height: 95vh;
   overflow: auto;
   padding: 16px;
   background: var(--panel);
@@ -719,6 +742,21 @@ body {
   color: #ffffff;
 }
 
+.when-label {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.when-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
 .reminder-options {
   margin: 0;
   padding: 0;
@@ -738,26 +776,55 @@ body {
   color: var(--text);
   font-size: 12px;
   cursor: pointer;
+}
 
-  &.accent-red {
-    color: #ff4d4d;
-  }
+.reminder-category {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
 
-  &.accent-rust {
-    color: #b7410e;
-  }
+.reminder-when {
+  margin-left: 4px;
+  color: var(--text);
+  font-weight: 500;
+}
 
-  &.accent-cyan {
-    color: #22e0ff;
-  }
+.reminder-item {
+  cursor: pointer;
+}
 
-  &.accent-mustard {
-    color: #ceff00;
-  }
+.player-info .reminder-item {
+  pointer-events: auto;
+}
 
-  &.accent-olive {
-    color: #ffb100;
-  }
+.reminder-item:hover {
+  opacity: 0.7;
+}
+
+/* Reminder accent colours. Single source of truth: the --accent-* custom
+   properties above, mapped from categories in src/reminders/categories.ts. */
+.accent-red {
+  color: var(--accent-red);
+}
+
+.accent-rust {
+  color: var(--accent-rust);
+}
+
+.accent-cyan {
+  color: var(--accent-cyan);
+}
+
+.accent-mustard {
+  color: var(--accent-mustard);
+}
+
+.accent-olive {
+  color: var(--accent-olive);
 }
 
 .reminder-option:hover {

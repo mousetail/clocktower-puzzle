@@ -24,7 +24,7 @@
       "information": [
         {
           "night": 1,
-          "information": "P5 & P4: No"
+          "information": "P5 & P2: Yes"
         },
         {
           "night": 2,
@@ -32,7 +32,7 @@
         },
         {
           "night": 3,
-          "information": "P5 & P2: Yes"
+          "information": "P1 & P3: Yes"
         }
       ]
     },
@@ -69,25 +69,31 @@
     },
     {
       "name": "Ethiene",
-      "role": "Washerwoman",
+      "role": "Undertaker",
       "death_status": {
         "cause": "demon",
         "night": 3
       },
       "information": [
         {
-          "night": 1,
-          "information": "Either p4 or p6 is the Ravenkeeper"
+          "night": 2,
+          "information": "Empath"
         }
       ]
     },
     {
       "name": "Felix",
-      "role": "Mayor",
+      "role": "Virgin",
       "death_status": {
         "cause": "execution",
         "day": 2
-      }
+      },
+      "information": [
+        {
+          "day": 2,
+          "information": "Nominated by P5, P5 was not executed"
+        }
+      ]
     },
     {
       "name": "Giovani",
@@ -115,7 +121,7 @@
       "night": 2,
       "day": 2,
       "executed": [6],
-      "nominated": [1, 3],
+      "nominated": [1, 3, 5],
       "voted": [1, 2, 3, 4, 5, 6],
       "deaths_at_night": [4]
     },

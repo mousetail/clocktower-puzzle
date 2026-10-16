@@ -1,8 +1,11 @@
 import { dayOrder, nightOrder } from "./deaths.ts";
 import { el } from "./dom.ts";
+import { tagLabel } from "./labels.ts";
 import { buildPlayerTag, buildPlayerText } from "./playerTag.ts";
 import type { PlayerTagHandlers } from "./playerTag.ts";
 import type { InfoLogState } from "./infoLogState.ts";
+import { reminderById } from "./reminders/index.ts";
+import type { ReminderState } from "./reminderState.ts";
 import type { DayLogEntry, DeathEvent, LogEntry, PlayerInfo } from "./types.ts";
 
 type LogContext = {
@@ -10,6 +13,8 @@ type LogContext = {
   deaths: Map<number, DeathEvent[]>;
   handlers: PlayerTagHandlers;
   infoLog: InfoLogState;
+  reminders: ReminderState;
+  showReminders: boolean;
 };
 
 export class LogView {
@@ -21,8 +26,17 @@ export class LogView {
     deaths: Map<number, DeathEvent[]>,
     handlers: PlayerTagHandlers,
     infoLog: InfoLogState,
+    reminders: ReminderState,
+    showReminders: boolean,
   ) {
-    const context: LogContext = { players, deaths, handlers, infoLog };
+    const context: LogContext = {
+      players,
+      deaths,
+      handlers,
+      infoLog,
+      reminders,
+      showReminders,
+    };
     this.root = el("div", "log");
     for (const entry of timeline) {
       this.root.append(buildEntry(entry, context));
@@ -52,6 +66,10 @@ function buildNight(
   section.append(el("h3", "phase-title", `Night ${night}`));
   section.append(buildPlayers("Deaths", deathsAtNight, context, "no deaths"));
   section.append(...buildInfoRows("night", night, context));
+  const reminders = buildReminderRow("night", night, context);
+  if (reminders !== null) {
+    section.append(reminders);
+  }
   return section;
 }
 
@@ -62,7 +80,53 @@ function buildDay(entry: DayLogEntry, context: LogContext): HTMLElement {
   section.append(buildNominated(entry, context));
   section.append(buildPlayers("Voted", entry.voted, context, "none"));
   section.append(...buildInfoRows("day", entry.day, context));
+  const reminders = buildReminderRow("day", entry.day, context);
+  if (reminders !== null) {
+    section.append(reminders);
+  }
   return section;
+}
+
+function buildReminderRow(
+  phase: "night" | "day",
+  number: number,
+  context: LogContext,
+): HTMLElement | null {
+  if (!context.showReminders) {
+    return null;
+  }
+  const chips: HTMLElement[] = [];
+  context.players.forEach((_player, index) => {
+    const playerNumber = index + 1;
+    for (const entry of context.reminders.get(playerNumber)) {
+      if (entry.when === undefined) {
+        continue;
+      }
+      if (entry.when.phase !== phase || entry.when.number !== number) {
+        continue;
+      }
+      const reminder = reminderById(entry.id);
+      if (reminder === undefined) {
+        continue;
+      }
+      const chip = el(
+        "span",
+        "reminder-chip",
+        `${tagLabel(playerNumber, context.players, context.handlers.getLabelMode())} ${reminder.short}`,
+      );
+      chip.classList.add(`accent-${reminder.accent}`);
+      chips.push(chip);
+    }
+  });
+  if (chips.length === 0) {
+    return null;
+  }
+  const row = el("div", "log-row");
+  row.append(el("span", "log-label", "Reminders"));
+  const value = el("span", "log-value");
+  value.append(...chips);
+  row.append(value);
+  return row;
 }
 
 function buildInfoRows(

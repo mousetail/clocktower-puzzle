@@ -6,8 +6,7 @@ const GENERAL_NOTICE =
 
 const EDITION_NOTICES: Record<string, string> = {
   "Trouble Brewing":
-    "Evil players may lie. A drunk believes they are a townsfolk and may " +
-    "maintain that cover. Other good players honestly report their character, " +
+    "Evil players may lie. Other good players honestly report their character, " +
     "choices, and information received.",
   "Sects and Violets":
     "Evil players may lie. A living mutant may maintain a townsfolk cover. " +

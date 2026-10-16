@@ -1,14 +1,14 @@
 import { el } from "./dom.ts";
-import { playerLabel, statusClass } from "./format.ts";
-import { reminderById } from "./reminders.ts";
-import type { ReminderState } from "./reminderState.ts";
+import { describeReminderWhen, playerLabel, statusClass } from "./format.ts";
+import { reminderById } from "./reminders/index.ts";
+import type { ReminderEntry, ReminderState } from "./reminderState.ts";
 import type { PlayerInfo } from "./types.ts";
 
 export type CircleCallbacks = {
   onSelect: (player: number) => void;
   onHover: (player: number | null) => void;
   onAddReminder: (player: number) => void;
-  onRemoveReminder: (player: number, id: string) => void;
+  onRemoveReminder: (player: number, entry: ReminderEntry) => void;
 };
 
 const RADIUS_PERCENT = 42;
@@ -71,17 +71,23 @@ export class CircleView {
   updateReminders(state: ReminderState): void {
     for (const [number, chips] of this.chips) {
       const elements: HTMLElement[] = [];
-      for (const id of state.get(number)) {
-        const reminder = reminderById(id);
+      for (const entry of state.get(number)) {
+        const reminder = reminderById(entry.id);
         if (reminder === undefined) {
           continue;
         }
-        const chip = el("span", "reminder-chip", reminder.short);
+        const chip = el("span", "reminder-chip");
         chip.classList.add(`accent-${reminder.accent}`);
+        chip.append(reminder.short);
+        if (entry.when !== undefined) {
+          chip.append(
+            el("span", "reminder-when", describeReminderWhen(entry.when)),
+          );
+        }
         chip.title = `Remove ${reminder.full}`;
         chip.addEventListener("click", (event) => {
           event.stopPropagation();
-          this.callbacks.onRemoveReminder(number, id);
+          this.callbacks.onRemoveReminder(number, entry);
         });
         elements.push(chip);
       }
