@@ -1,0 +1,383 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Clocktower Game",
+  "description": "A recorded Blood on the Clocktower game: a player roster with information and death status, plus a day/night timeline. Player numbers are 1-based and refer to the index of the player in the roster.",
+  "type": "object",
+  "required": ["name", "players", "timeline"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional reference to this schema, for editor autocomplete, e.g. \"./game.schema.json\"."
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the game."
+    },
+    "edition": {
+      "type": "string",
+      "description": "Script or edition the game was played with.",
+      "enum": [
+        "Trouble Brewing",
+        "Sects and Violets",
+        "Bad Moon Rising",
+        "custom"
+      ]
+    },
+    "author": {
+      "type": "string",
+      "description": "Who recorded the game."
+    },
+    "publication_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the game was published, as an ISO 8601 calendar date (YYYY-MM-DD)."
+    },
+    "bag": {
+      "type": "object",
+      "description": "The token bag used for this game.",
+      "additionalProperties": false,
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "description": "Tokens in the bag; each is either a role name or a substitution (e.g. a Drunk that thinks it is another role).",
+          "items": { "$ref": "#/$defs/bagToken" }
+        },
+        "bluffs": {
+          "type": "array",
+          "description": "Roles shown to the demon as bluffs.",
+          "items": { "$ref": "#/$defs/role" }
+        }
+      }
+    },
+    "players": {
+      "type": "array",
+      "description": "Players in seating order; index + 1 is the player number used throughout the timeline.",
+      "items": { "$ref": "#/$defs/player" }
+    },
+    "timeline": {
+      "type": "array",
+      "description": "Ordered log of days (each with its preceding night) and standalone nights.",
+      "items": { "$ref": "#/$defs/logEntry" }
+    }
+  },
+  "$defs": {
+    "player": {
+      "type": "object",
+      "required": ["name", "role", "death_status"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "$ref": "#/$defs/role" },
+        "information": {
+          "type": "array",
+          "default": [],
+          "description": "Information this player received, in chronological order.",
+          "items": { "$ref": "#/$defs/informationEntry" }
+        },
+        "death_status": {
+          "$ref": "#/$defs/deathStatus",
+          "description": "How and when the player died, or \"alive\". Defaults to \"alive\" when omitted."
+        }
+      }
+    },
+    "informationEntry": {
+      "description": "A single piece of information a player received on a given day or night.",
+      "oneOf": [
+        { "$ref": "#/$defs/nightInformation" },
+        { "$ref": "#/$defs/dayInformation" }
+      ]
+    },
+    "nightInformation": {
+      "type": "object",
+      "required": ["night", "information"],
+      "additionalProperties": false,
+      "properties": {
+        "night": { "$ref": "#/$defs/phaseNumber" },
+        "information": { "$ref": "#/$defs/informationValue" }
+      }
+    },
+    "dayInformation": {
+      "type": "object",
+      "required": ["day", "information"],
+      "additionalProperties": false,
+      "properties": {
+        "day": { "$ref": "#/$defs/phaseNumber" },
+        "information": { "$ref": "#/$defs/informationValue" }
+      }
+    },
+    "informationValue": {
+      "description": "The information itself, e.g. a count, a yes/no, or a free-form note.",
+      "type": ["string", "number"]
+    },
+    "deathStatus": {
+      "description": "\"alive\", or the cause and phase of the player's death.",
+      "oneOf": [
+        { "const": "alive" },
+        { "$ref": "#/$defs/demonDeath" },
+        { "$ref": "#/$defs/witchDeath" },
+        { "$ref": "#/$defs/executionDeath" }
+      ]
+    },
+    "demonDeath": {
+      "type": "object",
+      "required": ["cause", "night"],
+      "additionalProperties": false,
+      "properties": {
+        "cause": { "const": "demon" },
+        "night": { "$ref": "#/$defs/phaseNumber" }
+      }
+    },
+    "witchDeath": {
+      "type": "object",
+      "required": ["cause", "day"],
+      "additionalProperties": false,
+      "properties": {
+        "cause": { "const": "witch" },
+        "day": { "$ref": "#/$defs/phaseNumber" }
+      }
+    },
+    "executionDeath": {
+      "type": "object",
+      "required": ["cause", "day"],
+      "additionalProperties": false,
+      "properties": {
+        "cause": { "const": "execution" },
+        "day": { "$ref": "#/$defs/phaseNumber" }
+      }
+    },
+    "logEntry": {
+      "description": "A day (with its preceding night) or a standalone night.",
+      "oneOf": [
+        { "$ref": "#/$defs/dayLogEntry" },
+        { "$ref": "#/$defs/nightLogEntry" }
+      ]
+    },
+    "dayLogEntry": {
+      "type": "object",
+      "required": ["day"],
+      "additionalProperties": false,
+      "properties": {
+        "day": { "$ref": "#/$defs/phaseNumber" },
+        "night": {
+          "$ref": "#/$defs/phaseNumber",
+          "description": "The night preceding this day. Defaults to the day number when omitted."
+        },
+        "deaths_at_night": {
+          "$ref": "#/$defs/playerIdList",
+          "description": "Players who died during the preceding night."
+        },
+        "nominated": {
+          "$ref": "#/$defs/playerIdList",
+          "description": "Players who were nominated, in order."
+        },
+        "voted": {
+          "$ref": "#/$defs/playerIdList",
+          "description": "Players who voted."
+        },
+        "executed": {
+          "$ref": "#/$defs/playerIdList",
+          "description": "Players who were executed."
+        },
+        "witch_deaths": {
+          "$ref": "#/$defs/playerIdList",
+          "description": "Players killed by the Witch; each must also appear in \"nominated\"."
+        }
+      }
+    },
+    "nightLogEntry": {
+      "type": "object",
+      "required": ["night"],
+      "additionalProperties": false,
+      "properties": {
+        "night": { "$ref": "#/$defs/phaseNumber" },
+        "deaths_at_night": {
+          "$ref": "#/$defs/playerIdList",
+          "description": "Players who died during this night."
+        }
+      }
+    },
+    "playerIdList": {
+      "description": "One or more player numbers (1-based).",
+      "oneOf": [
+        { "$ref": "#/$defs/playerId" },
+        { "type": "array", "items": { "$ref": "#/$defs/playerId" } }
+      ]
+    },
+    "playerId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "phaseNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "role": {
+      "description": "A role name from Blood on the Clocktower (Townsfolk, Outsider, Minion, or Demon).",
+      "type": "string",
+      "enum": [
+        "Acrobat",
+        "Al-Hadikhia",
+        "Alchemist",
+        "Alsaahir",
+        "Amnesiac",
+        "Artist",
+        "Assassin",
+        "Atheist",
+        "Balloonist",
+        "Banshee",
+        "Barber",
+        "Baron",
+        "Boffin",
+        "Boomdandy",
+        "Bounty Hunter",
+        "Butler",
+        "Cannibal",
+        "Cerenovus",
+        "Chambermaid",
+        "Chef",
+        "Choirboy",
+        "Clockmaker",
+        "Courtier",
+        "Cult Leader",
+        "Damsel",
+        "Devil's Advocate",
+        "Dreamer",
+        "Drunk",
+        "Empath",
+        "Engineer",
+        "Evil Twin",
+        "Exorcist",
+        "Fang Gu",
+        "Farmer",
+        "Fearmonger",
+        "Fisherman",
+        "Flowergirl",
+        "Fool",
+        "Fortune Teller",
+        "Gambler",
+        "General",
+        "Goblin",
+        "Godfather",
+        "Golem",
+        "Goon",
+        "Gossip",
+        "Grandmother",
+        "Harpy",
+        "Hatter",
+        "Heretic",
+        "Hermit",
+        "High Priestess",
+        "Huntsman",
+        "Imp",
+        "Innkeeper",
+        "Investigator",
+        "Juggler",
+        "Kazali",
+        "King",
+        "Klutz",
+        "Knight",
+        "Legion",
+        "Leviathan",
+        "Librarian",
+        "Lil' Monsta",
+        "Lleech",
+        "Lord of Typhon",
+        "Lunatic",
+        "Lycanthrope",
+        "Magician",
+        "Marionette",
+        "Mastermind",
+        "Mathematician",
+        "Mayor",
+        "Mezepheles",
+        "Minstrel",
+        "Monk",
+        "Moonchild",
+        "Mutant",
+        "Nightwatchman",
+        "No Dashii",
+        "Noble",
+        "Ogre",
+        "Ojo",
+        "Oracle",
+        "Organ Grinder",
+        "Pacifist",
+        "Philosopher",
+        "Pit-Hag",
+        "Pixie",
+        "Plague Doctor",
+        "Po",
+        "Poisoner",
+        "Politician",
+        "Poppy Grower",
+        "Preacher",
+        "Princess",
+        "Professor",
+        "Psychopath",
+        "Pukka",
+        "Puzzlemaster",
+        "Qutler",
+        "Ravenkeeper",
+        "Recluse",
+        "Riot",
+        "Sage",
+        "Sailor",
+        "Saint",
+        "Savant",
+        "Scarlet Woman",
+        "Seamstress",
+        "Shabaloth",
+        "Shugenja",
+        "Slayer",
+        "Snake Charmer",
+        "Snitch",
+        "Soldier",
+        "Spy",
+        "Steward",
+        "Summoner",
+        "Sweetheart",
+        "Tea Lady",
+        "Tinker",
+        "Town Crier",
+        "Undertaker",
+        "Vigormortis",
+        "Village Idiot",
+        "Virgin",
+        "Vizier",
+        "Vortox",
+        "Washerwoman",
+        "Widow",
+        "Witch",
+        "Wizard",
+        "Wraith",
+        "Xaan",
+        "Yaggababble",
+        "Zealot",
+        "Zombuul"
+      ]
+    },
+    "bagToken": {
+      "description": "A bag token: a plain role name, or a substitution pairing the role it appears to be with the role it actually is.",
+      "oneOf": [
+        { "$ref": "#/$defs/role" },
+        { "$ref": "#/$defs/substitutedToken" }
+      ]
+    },
+    "substitutedToken": {
+      "type": "object",
+      "required": ["thinks", "actual"],
+      "additionalProperties": false,
+      "properties": {
+        "thinks": {
+          "$ref": "#/$defs/role",
+          "description": "The role the token appears to be."
+        },
+        "actual": {
+          "$ref": "#/$defs/role",
+          "description": "The role the token actually is."
+        }
+      }
+    }
+  }
+}

@@ -9,6 +9,11 @@ export class ReminderPicker {
   private readonly state: ReminderState;
   private readonly onChange: () => void;
   private player: number | null = null;
+  private readonly onKeydown = (event: KeyboardEvent): void => {
+    if (event.key === "Escape") {
+      this.close();
+    }
+  };
 
   constructor(state: ReminderState, onChange: () => void) {
     this.state = state;
@@ -34,15 +39,15 @@ export class ReminderPicker {
         this.close();
       }
     });
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        this.close();
-      }
-    });
+    document.addEventListener("keydown", this.onKeydown);
   }
 
   get element(): HTMLElement {
     return this.overlay;
+  }
+
+  destroy(): void {
+    document.removeEventListener("keydown", this.onKeydown);
   }
 
   open(player: number, name: string): void {

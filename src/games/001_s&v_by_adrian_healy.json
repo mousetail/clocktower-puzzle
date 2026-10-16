@@ -1,4 +1,9 @@
 {
+  "$schema": "./game.schema.json",
+  "name": "S&V By Adrian Healy",
+  "edition": "Sects and Violets",
+  "author": "Adrian Healy",
+  "publication_date": "2026-09-16",
   "players": [
     {
       "name": "Alice",
