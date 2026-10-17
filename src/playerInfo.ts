@@ -13,6 +13,7 @@ import type { NotesControls } from "./notesState.ts";
 import { reminderById } from "./reminders/index.ts";
 import type { ReminderEntry } from "./reminderState.ts";
 import type { PlayerInfo } from "./types.ts";
+import type { Edition } from "./games.ts";
 
 export type ReminderControls = {
   onRemove: (player: number, entry: ReminderEntry) => void;
@@ -25,7 +26,7 @@ export class PlayerInfoView {
   private readonly infoLog: InfoLogControls;
   private readonly notes: NotesControls;
   private readonly reminders: ReminderControls;
-  private readonly edition: string | undefined;
+  private readonly edition: Edition;
 
   constructor(
     players: readonly PlayerInfo[],
@@ -33,7 +34,7 @@ export class PlayerInfoView {
     infoLog: InfoLogControls,
     notes: NotesControls,
     reminders: ReminderControls,
-    edition?: string,
+    edition: Edition,
   ) {
     this.players = players;
     this.handlers = handlers;
@@ -106,7 +107,7 @@ export class PlayerInfoView {
   }
 }
 
-function demonHint(edition: string): string {
+function demonHint(edition: Edition): string {
   if (edition === "Bad Moon Rising") {
     return (
       "Exactly one living or dead player is the demon."

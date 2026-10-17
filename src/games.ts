@@ -1,17 +1,19 @@
 import type { RawGameData } from "./data.ts";
 
+export type Edition = 'Trouble Brewing' | 'Sects and Violets' | 'Bad Moon Rising' | 'custom';
+
 export type RawGameFile = RawGameData & {
   name: string;
-  edition?: string;
-  author?: string;
-  publication_date?: string;
+  edition: Edition;
+  author: string;
+  publication_date: string;
 };
 
 export type GameEntry = {
   id: string;
   name: string;
-  edition?: string;
-  author?: string;
+  edition: Edition;
+  author: string;
   publicationDate?: string;
   data: RawGameFile;
 };
