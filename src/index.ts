@@ -1,7 +1,7 @@
 import "./style.css";
 import { CircleView } from "./circle.ts";
 import { parseGame } from "./data.ts";
-import { collectDeaths, collectPhases } from "./deaths.ts";
+import { collectDeaths, collectPhases, collectResurrections } from "./deaths.ts";
 import { el } from "./dom.ts";
 import { findGame, GAMES } from "./games.ts";
 import type { GameEntry } from "./games.ts";
@@ -70,11 +70,15 @@ function renderGame(game: GameEntry): () => void {
 
   const data = parseGame(game.data);
   const deaths = collectDeaths(data.timeline, data.players.length);
+  const resurrections = collectResurrections(
+    data.timeline,
+    data.players.length,
+  );
   const phases = collectPhases(data.timeline);
   const issues = [
     ...data.dataIssues,
-    ...validateGame(data.players, deaths),
-    ...validateTimeline(data.timeline),
+    ...validateGame(data.players, deaths, resurrections),
+    ...validateTimeline(data.timeline, deaths, resurrections),
   ];
 
   for (const issue of issues) {
@@ -133,6 +137,7 @@ function renderGame(game: GameEntry): () => void {
     infoLogControls,
     notesControls,
     { onRemove: removeReminderEntry },
+    game.edition,
   );
   let picker: ReminderPicker | null = null;
 
@@ -235,6 +240,7 @@ function renderGame(game: GameEntry): () => void {
         data.timeline,
         data.players,
         deaths,
+        resurrections,
         handlers,
         infoLogState,
         reminderState,

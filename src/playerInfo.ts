@@ -25,6 +25,7 @@ export class PlayerInfoView {
   private readonly infoLog: InfoLogControls;
   private readonly notes: NotesControls;
   private readonly reminders: ReminderControls;
+  private readonly edition: string | undefined;
 
   constructor(
     players: readonly PlayerInfo[],
@@ -32,12 +33,14 @@ export class PlayerInfoView {
     infoLog: InfoLogControls,
     notes: NotesControls,
     reminders: ReminderControls,
+    edition?: string,
   ) {
     this.players = players;
     this.handlers = handlers;
     this.infoLog = infoLog;
     this.notes = notes;
     this.reminders = reminders;
+    this.edition = edition;
     this.root = el("div", "player-info");
     this.render(null, undefined, []);
   }
@@ -62,11 +65,7 @@ export class PlayerInfoView {
     if (number === null || player === undefined) {
       replaceChildren(
         this.root,
-        el(
-          "p",
-          "info-hint",
-          "Exactly one of the 3 living players is the demon.",
-        ),
+        el("p", "info-hint", demonHint(this.edition)),
       );
       return;
     }
@@ -105,6 +104,15 @@ export class PlayerInfoView {
     section.append(list);
     return section;
   }
+}
+
+function demonHint(edition: string): string {
+  if (edition === "Bad Moon Rising") {
+    return (
+      "Exactly one living or dead player is the demon."
+    );
+  }
+  return "Exactly one of the 3 living players is the demon.";
 }
 
 function buildHeader(number: number, player: PlayerInfo): HTMLElement {

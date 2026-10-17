@@ -167,6 +167,10 @@
           "$ref": "#/$defs/playerIdList",
           "description": "Players who died during the preceding night."
         },
+        "resurrected_at_night": {
+          "$ref": "#/$defs/playerIdList",
+          "description": "Players who were resurrected during the preceding night (e.g. by the Professor or Shabaloth); each must have been dead at the time."
+        },
         "nominated": {
           "$ref": "#/$defs/playerIdList",
           "description": "Players who were nominated, in order."
@@ -178,6 +182,10 @@
         "executed": {
           "$ref": "#/$defs/playerIdList",
           "description": "Players who were executed."
+        },
+        "survived_execution": {
+          "$ref": "#/$defs/playerIdList",
+          "description": "Players who were executed but did not die; each must also appear in \"executed\"."
         },
         "witch_deaths": {
           "$ref": "#/$defs/playerIdList",
@@ -194,6 +202,10 @@
         "deaths_at_night": {
           "$ref": "#/$defs/playerIdList",
           "description": "Players who died during this night."
+        },
+        "resurrected_at_night": {
+          "$ref": "#/$defs/playerIdList",
+          "description": "Players who were resurrected during this night (e.g. by the Professor or Shabaloth); each must have been dead at the time."
         }
       }
     },

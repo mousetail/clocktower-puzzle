@@ -1,4 +1,103 @@
 import type { ReminderDraft } from "./types.ts";
 
 /** Tokens specific to the Bad Moon Rising edition. */
-export const BAD_MOON_RISING_REMINDERS: readonly ReminderDraft[] = [];
+export const BAD_MOON_RISING_REMINDERS: readonly ReminderDraft[] = [
+  {
+    id: "assasin",
+    full: "Assasin",
+    short: "Assasin",
+    category: "minion",
+    parent: "minion",
+  },
+  {
+    id: "devils-advocate",
+    full: "Devils Advocate",
+    short: "Devils Advocate",
+    category: "minion",
+    parent: "minion",
+  },
+  {
+    id: "godfather",
+    full: "Godfather",
+    short: "Godfather",
+    category: "minion",
+    parent: "minion",
+  },
+  {
+    id: "mastermind",
+    full: "Mastermind",
+    short: "Mastermind",
+    category: "minion",
+    parent: "minion",
+  },
+  {
+    id: "shab",
+    full: "Shaboloth",
+    short: "Shaboloth",
+    category: "demon",
+    parent: "demon",
+  },
+  {
+    id: "Po",
+    full: "Po",
+    short: "Po",
+    category: "demon",
+    parent: "demon",
+  },
+  {
+    id: "zombuul",
+    full: "Zombuul",
+    short: "Zombuul",
+    category: "demon",
+    parent: "demon",
+  },
+  {
+    id: "pukka",
+    full: "Pukka",
+    short: "Pukka",
+    category: "demon",
+    parent: "demon",
+  },
+  {
+    id: "pukka-poisoned",
+    full: "Pukka Poisoned",
+    short: "Pukka Poisoned",
+    category: "droisoning",
+    parent: "poisoned",
+  },
+  {
+    id: "sailor-poisoned",
+    full: "Sailor Poisoned",
+    short: "Sailor Poisoned",
+    category: "droisoning",
+    parent: "poisoned",
+  },
+  {
+    id: "innkeeper-poisoned",
+    full: "Innkeeper Poisoned",
+    short: "Innkeeper Poisoned",
+    category: "droisoning",
+    parent: "poisoned",
+  },
+  {
+    id: "courtier-poisoned",
+    full: "Courtier Poisoned",
+    short: "Courtier Poisoned",
+    category: "droisoning",
+    parent: "poisoned",
+  },
+  {
+    id: "lunatic",
+    full: "Lunatic",
+    short: "Lunatic",
+    category: "outsider",
+    parent: "outsider",
+  },
+  {
+    id: "minstrel-day",
+    full: "Minstrel Day",
+    short: "Minstrel Day",
+    category: "droisoning",
+    parent: "poisoned",
+  },
+];

@@ -28,9 +28,11 @@ export type RawLogEntry = {
   day?: number;
   night?: number;
   deaths_at_night?: number | readonly number[];
+  resurrected_at_night?: readonly number[];
   nominated?: readonly number[];
   voted?: readonly number[];
   executed?: readonly number[];
+  survived_execution?: readonly number[];
   witch_deaths?: readonly number[];
 };
 
@@ -145,9 +147,11 @@ function parseLogEntry(raw: RawLogEntry): LogEntry {
       day: raw.day,
       night: raw.night ?? raw.day,
       deaths_at_night: deaths,
+      resurrected_at_night: toIds(raw.resurrected_at_night),
       nominated: toIds(raw.nominated),
       voted: toIds(raw.voted),
       executed: toIds(raw.executed),
+      survived_execution: toIds(raw.survived_execution),
       witch_deaths: toIds(raw.witch_deaths),
     };
     return entry;
@@ -156,6 +160,7 @@ function parseLogEntry(raw: RawLogEntry): LogEntry {
     kind: "night",
     night: raw.night ?? 0,
     deaths_at_night: deaths,
+    resurrected_at_night: toIds(raw.resurrected_at_night),
   };
   return entry;
 }

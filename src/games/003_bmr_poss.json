@@ -1,0 +1,178 @@
+{
+  "$schema": "./game.schema.json",
+  "name": "The Sun is Shining",
+  "author": "mousetail",
+  "publication_date": "2026-10-17",
+  "edition": "Bad Moon Rising",
+  "bag": {
+    "tokens": [
+      "Zombuul",
+      "Godfather",
+      { "thinks": "Zombuul", "actual": "Lunatic" },
+      "Gossip",
+      "Professor",
+      "Tea Lady",
+      "Minstrel",
+      "Tinker"
+    ],
+    "bluffs": ["Chambermaid", "Sailor", "Gambler"]
+  },
+  "players": [
+    {
+      "death_status": "alive",
+      "name": "Alice",
+      "role": "Professor",
+      "information": [
+        {
+          "night": 3,
+          "information": "Resurrected P4"
+        }
+      ]
+    },
+    {
+      "death_status": {
+        "cause": "execution",
+        "day": 1
+      },
+      "name": "Bob",
+      "role": "Grandmother",
+      "information": [
+        {
+          "night": 1,
+          "information": "Learned P5 is the exorcist"
+        }
+      ]
+    },
+    {
+      "name": "Charlie",
+      "death_status": {
+        "cause": "execution",
+        "day": 2
+      },
+      "role": "Chambermaid",
+      "information": [
+        {
+          "night": 1,
+          "information": "Checked P5 and P8, Learned a 2"
+        },
+        {
+          "night": 2,
+          "information": "Checked P1 and P6, learned a 0"
+        }
+      ]
+    },
+    {
+      "name": "Deboarah",
+      "role": "Minstrel",
+      "death_status": "alive",
+      "information": [
+      ]
+    },
+    {
+      "name": "Ethiene",
+      "role": "Exorcist",
+      "death_status": {
+        "cause": "execution",
+        "day": 3
+      },
+      "information": [
+        {
+          "night": 2,
+          "information": "Picked P3"
+        },
+        {
+          "night": 3,
+          "information": "Picked P7"
+        }
+      ]
+    },
+    {
+      "name": "Felix",
+      "role": "Tea Lady",
+      "death_status": {
+        "cause": "demon",
+        "night": 2
+      },
+      "information": [
+      ]
+    },
+    {
+      "name": "Genevive",
+      "role": "Goon",
+      "death_status": "alive",
+      "information": [
+        {
+          "day": 5,
+          "information": "Claims to never have changed alignment"
+        }
+      ]
+    },
+    {
+      "name": "Hannah",
+      "role": "Gossip",
+      "death_status": {
+        "cause": "demon",
+        "night": 5
+      },
+      "information": [
+        {
+          "day": 1,
+          "information": "Gossiped that the demon is P3, P4, P5, or P6"
+        },
+        {
+          "day": 2,
+          "information": "Gossiped that the demon is P5, P6, P7, or P8"
+        },
+        {
+          "day": 3,
+          "information": "Gossiped that the demon is P1"
+        },
+        {
+          "day": 4,
+          "information": "Gossiped that 2+2 equals a million"
+        }
+      ]
+    },
+    {
+      "name": "Iris",
+      "role": "Tinker",
+      "death_status": {
+        "cause": "demon",
+        "night": 3
+      }
+    }
+  ],
+  "timeline": [
+    {
+      "day": 1,
+      "executed": [2],
+      "survived_execution": []
+    },
+    {
+      "night": 2,
+      "day": 2,
+      "deaths_at_night": [6, 4],
+
+      "executed": [3]
+    },
+    {
+      "night": 3,
+      "day": 3,
+      "deaths_at_night": [9],
+      "resurrected_at_night": [4],
+
+      "executed": [5]
+    },
+    {
+      "night": 4,
+      "day": 4,
+      "deaths_at_night": [],
+      "executed": [5]
+    },
+    {
+      "night": 5,
+      "day": 5,
+      "deaths_at_night": [8]
+    }
+  ]
+}

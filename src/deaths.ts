@@ -68,6 +68,9 @@ export function collectDeaths(
     }
     if (entry.kind === "day") {
       for (const player of entry.executed) {
+        if (entry.survived_execution.includes(player)) {
+          continue;
+        }
         append(deaths, player, {
           phase: "day",
           cause: "execution",
@@ -105,4 +108,87 @@ function append(
   } else {
     events.push(event);
   }
+}
+
+/** Nights on which each player was resurrected, in chronological order. */
+export function collectResurrections(
+  timeline: readonly LogEntry[],
+  playerCount: number,
+): Map<number, number[]> {
+  const resurrections = new Map<number, number[]>();
+  for (let player = 1; player <= playerCount; player++) {
+    resurrections.set(player, []);
+  }
+  for (const entry of timeline) {
+    for (const player of entry.resurrected_at_night) {
+      const nights = resurrections.get(player);
+      if (nights === undefined) {
+        resurrections.set(player, [entry.night]);
+      } else {
+        nights.push(entry.night);
+      }
+    }
+  }
+  for (const nights of resurrections.values()) {
+    nights.sort((a, b) => a - b);
+  }
+  return resurrections;
+}
+
+/** A death or a resurrection, placed on the shared chronological timeline. */
+type LifeMoment = { order: number; death: DeathEvent | null };
+
+function lifeMoments(
+  deaths: readonly DeathEvent[],
+  resurrections: readonly number[],
+): LifeMoment[] {
+  const moments: LifeMoment[] = [];
+  for (const death of deaths) {
+    moments.push({ order: phaseOrder(death), death });
+  }
+  for (const night of resurrections) {
+    moments.push({ order: nightOrder(night), death: null });
+  }
+  moments.sort((a, b) => a.order - b.order);
+  return moments;
+}
+
+/**
+ * The death a player is currently subject to, or null if they are alive. A
+ * death only counts while the player is alive, so repeat deaths are ignored and
+ * a later resurrection clears the death entirely.
+ */
+export function currentDeath(
+  deaths: readonly DeathEvent[],
+  resurrections: readonly number[],
+): DeathEvent | null {
+  let current: DeathEvent | null = null;
+  for (const moment of lifeMoments(deaths, resurrections)) {
+    if (moment.death === null) {
+      current = null;
+    } else if (current === null) {
+      current = moment.death;
+    }
+  }
+  return current;
+}
+
+/** Whether a player is dead immediately before the given chronological order. */
+export function isDeadBefore(
+  deaths: readonly DeathEvent[],
+  resurrections: readonly number[],
+  order: number,
+): boolean {
+  let dead = false;
+  for (const moment of lifeMoments(deaths, resurrections)) {
+    if (moment.order >= order) {
+      break;
+    }
+    if (moment.death === null) {
+      dead = false;
+    } else if (!dead) {
+      dead = true;
+    }
+  }
+  return dead;
 }

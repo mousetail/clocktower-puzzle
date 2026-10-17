@@ -37,9 +37,11 @@ export type DayLogEntry = {
   day: number;
   night: number;
   deaths_at_night: number[];
+  resurrected_at_night: number[];
   nominated: number[];
   voted: number[];
   executed: number[];
+  survived_execution: number[];
   witch_deaths: number[];
 };
 
@@ -47,6 +49,7 @@ export type NightLogEntry = {
   kind: "night";
   night: number;
   deaths_at_night: number[];
+  resurrected_at_night: number[];
 };
 
 export type LogEntry = DayLogEntry | NightLogEntry;
