@@ -114,17 +114,17 @@
       "description": "\"alive\", or the cause and phase of the player's death.",
       "oneOf": [
         { "const": "alive" },
-        { "$ref": "#/$defs/demonDeath" },
+        { "$ref": "#/$defs/nightDeath" },
         { "$ref": "#/$defs/witchDeath" },
         { "$ref": "#/$defs/executionDeath" }
       ]
     },
-    "demonDeath": {
+    "nightDeath": {
       "type": "object",
       "required": ["cause", "night"],
       "additionalProperties": false,
       "properties": {
-        "cause": { "const": "demon" },
+        "cause": { "const": "night-death" },
         "night": { "$ref": "#/$defs/phaseNumber" }
       }
     },

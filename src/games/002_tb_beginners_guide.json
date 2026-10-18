@@ -57,7 +57,7 @@
       "name": "Deboarah",
       "role": "Ravenkeeper",
       "death_status": {
-        "cause": "demon",
+        "cause": "night-death",
         "night": 2
       },
       "information": [
@@ -71,7 +71,7 @@
       "name": "Ethiene",
       "role": "Undertaker",
       "death_status": {
-        "cause": "demon",
+        "cause": "night-death",
         "night": 3
       },
       "information": [

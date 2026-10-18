@@ -4,7 +4,7 @@ export type InformationEntry =
 
 export type DeathStatus =
   | "alive"
-  | { cause: "demon"; night: number }
+  | { cause: "night-death"; night: number }
   | { cause: "witch" | "execution"; day: number };
 
 export type PlayerInfo = {
@@ -14,11 +14,11 @@ export type PlayerInfo = {
   death_status: DeathStatus;
 };
 
-export type DeathCause = "demon" | "witch" | "execution";
+export type DeathCause = "night-death" | "witch" | "execution";
 
 export type NightDeathEvent = {
   phase: "night";
-  cause: "demon";
+  cause: "night-death";
   night: number;
   repeat: boolean;
 };

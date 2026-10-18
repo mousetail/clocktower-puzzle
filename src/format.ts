@@ -14,8 +14,8 @@ export function describeStatus(status: DeathStatus): string {
   if (status === "alive") {
     return "Alive";
   }
-  if (status.cause === "demon") {
-    return `Killed by the demon on night ${status.night}`;
+  if (status.cause === "night-death") {
+    return `Killed during night ${status.night}`;
   }
   if (status.cause === "witch") {
     return `Killed by the witch on day ${status.day}`;
@@ -25,7 +25,7 @@ export function describeStatus(status: DeathStatus): string {
 
 export function describeEvent(event: DeathEvent): string {
   if (event.phase === "night") {
-    return `demon kill on night ${event.night}`;
+    return `night death on night ${event.night}`;
   }
   if (event.cause === "witch") {
     return `witch death on day ${event.day}`;

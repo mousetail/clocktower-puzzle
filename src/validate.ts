@@ -65,10 +65,10 @@ function matches(event: DeathEvent, status: DeathStatus): boolean {
   if (status === "alive") {
     return false;
   }
-  if (status.cause === "demon") {
+  if (status.cause === "night-death") {
     return (
       event.phase === "night" &&
-      event.cause === "demon" &&
+      event.cause === "night-death" &&
       event.night === status.night
     );
   }

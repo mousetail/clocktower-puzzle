@@ -90,7 +90,7 @@
       "name": "Felix",
       "role": "Tea Lady",
       "death_status": {
-        "cause": "demon",
+        "cause": "night-death",
         "night": 2
       },
       "information": [
@@ -111,7 +111,7 @@
       "name": "Hannah",
       "role": "Gossip",
       "death_status": {
-        "cause": "demon",
+        "cause": "night-death",
         "night": 5
       },
       "information": [
@@ -137,7 +137,7 @@
       "name": "Iris",
       "role": "Tinker",
       "death_status": {
-        "cause": "demon",
+        "cause": "night-death",
         "night": 3
       }
     }

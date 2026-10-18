@@ -61,7 +61,7 @@ export function collectDeaths(
     for (const player of entry.deaths_at_night) {
       append(deaths, player, {
         phase: "night",
-        cause: "demon",
+        cause: "night-death",
         night: entry.night,
         repeat: false,
       });

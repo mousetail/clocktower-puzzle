@@ -122,8 +122,8 @@ function parseDeathStatus(
     });
     return "alive";
   }
-  if (raw.cause === "demon" && raw.night !== undefined) {
-    return { cause: "demon", night: raw.night };
+  if (raw.cause === "night-death" && raw.night !== undefined) {
+    return { cause: "night-death", night: raw.night };
   }
   if (
     (raw.cause === "witch" || raw.cause === "execution") &&

@@ -48,7 +48,7 @@
         { "night": 4, "information": "P4: Sage / Pit Hag" }
       ],
       "death_status": {
-        "cause": "demon",
+        "cause": "night-death",
         "night": 5
       }
     },
@@ -75,7 +75,7 @@
         { "night": 5, "information": 2 }
       ],
       "death_status": {
-        "cause": "demon",
+        "cause": "night-death",
         "night": 6
       }
     },
@@ -99,7 +99,7 @@
         { "night": 3, "information": "P10, no swap" }
       ],
       "death_status": {
-        "cause": "demon",
+        "cause": "night-death",
         "night": 4
       }
     },
@@ -137,7 +137,7 @@
         }
       ],
       "death_status": {
-        "cause": "demon",
+        "cause": "night-death",
         "night": 2
       }
     }
